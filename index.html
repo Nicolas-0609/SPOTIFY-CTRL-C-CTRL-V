@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Clone</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- SIDEBAR (MENU LATERAL) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-brands fa-spotify"></i>
+                <span>Spotify</span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" id="nav-home" class="nav-item active">
+                    <i class="fa-solid fa-house"></i> Início
+                </a>
+                <a href="#" id="nav-creator" class="nav-item creator-only hidden">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Área do Criador
+                </a>
+                <a href="#" id="nav-liked" class="nav-item">
+                    <i class="fa-solid fa-heart"></i> Músicas Curtidas
+                </a>
+            </nav>
+
+            <button id="btn-import-itunes" class="btn-itunes" type="button">
+                <i class="fa-brands fa-apple"></i> Importar Hits (iTunes)
+            </button>
+
+            <div class="user-profile-bar">
+                <div class="user-info">
+                    <span id="user-display-name">Carregando...</span>
+                    <span id="user-role-tag" class="role-badge">-</span>
+                </div>
+                <button id="btn-logout" title="Sair / Trocar de Conta">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL (SPA) -->
+        <main class="main-content">
+            <header class="top-header">
+                <div id="search-box-wrapper" class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="O que você quer ouvir?">
+                </div>
+            </header>
+
+            <!-- VIEW: INÍCIO -->
+            <section id="view-home" class="view-section">
+                <h2>Músicas Disponíveis</h2>
+                <div id="songs-grid" class="songs-grid"></div>
+            </section>
+
+            <!-- VIEW: MÚSICAS CURTIDAS -->
+            <section id="view-liked" class="view-section hidden">
+                <h2>Suas Músicas Curtidas</h2>
+                <div id="liked-songs-grid" class="songs-grid"></div>
+            </section>
+
+            <!-- VIEW: ÁREA DO CRIADOR -->
+            <section id="view-creator" class="view-section hidden">
+                <h2>Área do Criador</h2>
+                <div class="creator-container">
+                    <form id="creator-form" class="creator-form">
+                        <h3>Publicar Nova Música</h3>
+                        
+                        <div class="form-group">
+                            <label>Título da Música</label>
+                            <input type="text" id="song-title" required placeholder="Ex: Blinding Lights">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Artista</label>
+                            <input type="text" id="song-artist" required placeholder="Ex: The Weeknd">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Arquivo de Áudio</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="song-audio-file" accept="audio/*" class="file-input" required>
+                                <label for="song-audio-file" class="btn-select-file">
+                                    <i class="fa-solid fa-music"></i> Escolher Áudio
+                                </label>
+                                <span id="audio-file-name" class="file-name">Nenhum arquivo selecionado</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Capa da Música (Upload ou URL)</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="song-cover-file" accept="image/*" class="file-input">
+                                <label for="song-cover-file" class="btn-select-file">
+                                    <i class="fa-solid fa-image"></i> Escolher Capa
+                                </label>
+                                <span id="cover-file-name" class="file-name">Nenhuma foto</span>
+                            </div>
+                            <input type="url" id="song-cover-url" placeholder="Ou cole o link da imagem (URL)" style="margin-top: 8px;">
+                        </div>
+
+                        <button type="submit" class="btn-submit">Publicar Música</button>
+                    </form>
+
+                    <div class="published-section">
+                        <h3>Suas Faixas Publicadas (<span id="published-count-badge">0 faixas</span>)</h3>
+                        <div id="creator-published-list" class="published-list"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- BARRA DO PLAYER DE ÁUDIO -->
+    <footer class="player-bar">
+        <div class="player-left">
+            <img id="player-cover" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&q=80" alt="Capa">
+            <div class="player-track-info">
+                <span id="player-title" class="track-title">Selecione uma música</span>
+                <span id="player-artist" class="track-artist">-</span>
+            </div>
+            <button id="btn-like-player" class="btn-like-player" title="Curtir / Descurtir">
+                <i class="fa-regular fa-heart"></i>
+            </button>
+        </div>
+
+        <div class="player-center">
+            <div class="player-controls">
+                <button id="btn-shuffle" class="control-btn" title="Aleatório"><i class="fa-solid fa-shuffle"></i></button>
+                <button id="btn-prev" class="control-btn" title="Anterior"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="btn-play" class="control-btn btn-play-main" title="Tocar/Pausar"><i id="play-icon" class="fa-solid fa-play"></i></button>
+                <button id="btn-next" class="control-btn" title="Próxima"><i class="fa-solid fa-forward-step"></i></button>
+                <button id="btn-repeat" class="control-btn" title="Repetir"><i class="fa-solid fa-repeat"></i></button>
+            </div>
+            <div class="player-progress">
+                <span id="current-time">0:00</span>
+                <input type="range" id="progress-bar" value="0" min="0" max="100">
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+
+        <div class="player-right">
+            <i id="volume-icon" class="fa-solid fa-volume-high"></i>
+            <input type="range" id="volume-bar" value="100" min="0" max="100">
+        </div>
+
+        <audio id="audio-player"></audio>
+    </footer>
+
+    <!-- MODAL DE BUSCA DO ITUNES -->
+    <div id="itunes-modal" class="auth-modal">
+        <div class="auth-card itunes-modal-card">
+            <div class="auth-header">
+                <i class="fa-brands fa-apple modal-logo"></i>
+                <h2>Buscar Músicas no iTunes</h2>
+            </div>
+            <div class="form-group">
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="itunes-search-input" placeholder="Digite artista ou música..." style="flex: 1;">
+                    <button id="btn-itunes-search-exec" class="btn-auth" style="width: auto; padding: 0 20px;">Buscar</button>
+                </div>
+            </div>
+            <div id="itunes-results-list" class="itunes-results-list"></div>
+            <button id="btn-close-itunes-modal" class="btn-auth" style="background: #333; color: #fff; margin-top: 16px;">Fechar</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE AUTENTICAÇÃO -->
+    <div id="auth-modal" class="auth-modal active">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fa-brands fa-spotify modal-logo"></i>
+                <h2 id="auth-modal-title">Entrar no Spotify</h2>
+            </div>
+
+            <!-- LOGIN -->
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-email">Endereço de e-mail</label>
+                    <input type="email" id="login-email" required placeholder="nome@exemplo.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Palavra-passe</label>
+                    <input type="password" id="login-password" required placeholder="Sua palavra-passe">
+                </div>
+                <button type="submit" class="btn-auth">Entrar</button>
+                <p class="auth-switch">
+                    Não tem uma conta? <a href="#" id="link-show-register">Inscrever-se no Spotify</a>
+                </p>
+            </form>
+
+            <!-- REGISTRO -->
+            <form id="register-form" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="reg-name">Como devemos chamar você?</label>
+                    <input type="text" id="reg-name" required placeholder="Seu nome de exibição">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Qual é o seu e-mail?</label>
+                    <input type="email" id="reg-email" required placeholder="nome@exemplo.com">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Crie uma palavra-passe</label>
+                    <input type="password" id="reg-password" required placeholder="Crie uma palavra-passe forte">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Conta</label>
+                    <div class="role-selector">
+                        <label class="radio-label">
+                            <input type="radio" name="account-role" value="listener" checked>
+                            <span>Ouvinte</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="account-role" value="creator">
+                            <span>Criador</span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-auth">Criar Conta</button>
+                <p class="auth-switch">
+                    Já tem uma conta? <a href="#" id="link-show-login">Faça login aqui</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script principal apontando para o seu main.js correto -->
+    <script type="module" src="JS/main.js"></script>
+</body>
+</html>
